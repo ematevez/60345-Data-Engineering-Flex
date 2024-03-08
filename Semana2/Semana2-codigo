@@ -1,0 +1,119 @@
+Momento 1 Creación de tablas calls, agents y customers para dar cumplimiento con el requerimiento que se necesita teniendo en cuenta la información que se provee 
+
+Momento 2 OLTP: Almacenar transacciones que se dieron en un día particular en la empresa de Call Center. Esto traducido a sentencias SQL 
+
+Momento 3 OLAP: extraer información para cada agente de: duración de venta más rápida, a qué cliente fue y el nombre del agente. Todo esto para poder otorgar bonos a los agentes.  
+
+Momento 4 Interpretación de resultados en términos de tiempo en cada consulta
+
+
+1-pip install psycopg2-binary
+
+2-Asegúrate de reemplazar "tu_host", "tu_base_de_datos", "tu_usuario", y "tu_contraseña" con la información adecuada para tu base de datos PostgreSQL. Además, ten en cuenta que este código asume que ya tienes la biblioteca psycopg2 instalada. Puedes instalarla utilizando el siguiente comando:
+
+import psycopg2
+from psycopg2 import sql
+
+# Conexión a la base de datos
+conn = psycopg2.connect(
+    host="tu_host",
+    database="tu_base_de_datos",
+    user="tu_usuario",
+    password="tu_contraseña"
+)
+
+# Creación de tablas
+with conn.cursor() as cursor:
+    cursor.execute("""
+    CREATE TABLE customers(
+        customerid INT primary key,
+        name VARCHAR(50),
+        occupation VARCHAR(50),
+        email VARCHAR(50),
+        company VARCHAR(50),
+        phonenumber VARCHAR(20),
+        age INT
+    );
+
+    CREATE TABLE agents(
+        agentid INT primary key,
+        name VARCHAR(50)
+    );
+
+    CREATE TABLE calls(
+        callid INT primary key,
+        agentid INT,
+        customerid INT,
+        pickedup SMALLINT,
+        duration INT,
+        productsold SMALLINT
+    );
+    """)
+    conn.commit()
+
+# Inserción de registros
+with conn.cursor() as cursor:
+    cursor.execute("""
+    INSERT INTO calls VALUES (10000, 4,6, 1, 130, 1);
+    INSERT INTO calls VALUES (10001, 5,7, 1, 131, 0);
+    INSERT INTO calls VALUES (10002, 10,260, 0, 0, 0);
+    INSERT INTO calls VALUES (10003, 3,5, 1, 60, 1);
+    INSERT INTO calls VALUES (10004, 10,731, 1, 90, 0);
+    INSERT INTO calls VALUES (10005, 4,415, 0, 0, 0);
+    """)
+    conn.commit()
+
+# Consulta analoga a OLAP
+with conn.cursor() as cursor:
+    cursor.execute("""
+    SELECT a.name AS AgentName, cu.name AS CustomerName, x.duration
+    FROM
+    (
+       SELECT ca.agentid, ca.duration, max(customerid) AS cid
+       FROM
+       (
+           SELECT agentid, min(duration) as fastestcall
+           FROM calls
+           WHERE productsold = 1
+           GROUP BY agentid
+       ) min
+       JOIN calls ca ON ca.agentid = min.agentid AND ca.duration = min.fastestcall
+       WHERE productsold = 1
+       GROUP BY ca.agentid, ca.duration
+    ) x
+    JOIN agents a ON x.agentid = a.agentid
+    JOIN customers cu ON cu.customerid = x.cid
+    """)
+    result = cursor.fetchall()
+    for row in result:
+        print(row)
+
+# Cierre de la conexión
+conn.close()
+
+
+
+#================================================================
+
+import pandas as pd
+import psycopg2
+
+# Conexión a la base de datos
+conn = psycopg2.connect(
+    host="tu_host",
+    database="tu_base_de_datos",
+    user="tu_usuario",
+    password="tu_contraseña"
+)
+
+# Cargar datos desde archivos CSV usando pandas
+csv_files = ["1.csv", "2.csv"]
+
+for csv_file in csv_files:
+    table_name = csv_file.split(".")[0]  # Tomar el nombre del archivo sin la extensión
+    df = pd.read_csv(csv_file)
+
+    df.to_sql(table_name, conn, if_exists='replace', index=False)
+
+# Cierre de la conexión
+conn.close()
