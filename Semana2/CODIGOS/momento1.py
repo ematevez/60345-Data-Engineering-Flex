@@ -5,7 +5,8 @@ from sqlalchemy import create_engine
 engine = create_engine("postgresql://postgres:12345@localhost/postgres")
 
 # Cargar datos desde archivos CSV usando pandas
-csv_files = ["agents.csv", "calls.csv", "customers.csv","calls_with_dates.csv"]
+csv_files = ["agents.csv", "calls.csv", "customers.csv"]
+#csv_files = ["agents.csv", "calls.csv", "customers.csv","calls_with_dates.csv"]
 
 for csv_file in csv_files:
     table_name = csv_file.split(".")[0]  # Tomar el nombre del archivo sin la extensión

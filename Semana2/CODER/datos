@@ -1,0 +1,20 @@
+-- Insertar datos en la tabla customers
+INSERT INTO customers (customerid, name, occupation, email, company, phonenumber, age)
+VALUES
+    (1, 'John Doe', 'Engineer', 'john.doe@email.com', 'ABC Corp', '555-1234', 30),
+    (2, 'Jane Smith', 'Teacher', 'jane.smith@email.com', 'XYZ School', '555-5678', 25),
+    (3, 'Bob Johnson', 'Doctor', 'bob.johnson@email.com', 'Medical Center', '555-9876', 40);
+
+-- Insertar datos en la tabla agents
+INSERT INTO agents (agentid, name)
+VALUES
+    (1, 'Agent 1'),
+    (2, 'Agent 2'),
+    (3, 'Agent 3');
+
+-- Insertar datos en la tabla calls
+INSERT INTO calls (callid, agentid, customerid, pickedup, duration, productsold)
+VALUES
+    (1, 1, 1, 1, 120, 1),
+    (2, 2, 2, 1, 180, 0),
+    (3, 3, 3, 0, 60, 1);

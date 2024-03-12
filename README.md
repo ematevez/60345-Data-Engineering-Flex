@@ -2,12 +2,10 @@
 
 
 
-### Hi there 👋
 
 ### SEMANA 1 -> 1. Semana 1 - Bienvenida al curso y nivelación
 ### SEMANA 2 -> 1. 2. Semana 2 - Introducción a Data Engineering
 
-**ematevez/ematevez** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
 Here are some ideas to get you started:
 
@@ -21,7 +19,7 @@ Here are some ideas to get you started:
 - ⚡ Fun fact: ...
 
 
-# **HOLA SOY EMANUEL**
+# **HOLA SOY UN COMENTARIO**
 ## Comentario.
 
 
