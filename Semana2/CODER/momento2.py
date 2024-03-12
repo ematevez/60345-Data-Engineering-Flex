@@ -1,22 +1,28 @@
 import pandas as pd
 from sqlalchemy import create_engine, text
 
-#CONEXION CON LA BASE DE DATOS
-sourse_engine = create_engine("postgresql://postgres:12345@localhost/basedatos")
-destino_engine = create_engine("postgresql://postgres:12345@localhost/basedatos1")
+# Conexión a la base de datos PostgreSQL
+source_engine = create_engine("postgresql://postgres:12345@localhost/postgres")
+destination_engine = create_engine("postgresql://postgres:12345@localhost/postgres1")
 
-fecha_particular = '2024-11-10'
+# Definir la fecha particular para la consulta (ajusta según tus necesidades)
+fecha_particular = '2024-03-06'
 
-query = text(f"SELECT * FROM calls_with_dates WHERE DATE (transaction_date)= '{fecha_particular}';")
+# Consulta SQL para obtener transacciones de un día particular
+query = text(f"SELECT * FROM calls_with_dates WHERE DATE(transaction_date) = '{fecha_particular}';")
 
-with sourse_engine.connect() as sourse_connection:
-    result = sourse_connection.execute(query)
+# Ejecutar la consulta en la base de datos de origen
+with source_engine.connect() as source_connection:
+    result = source_connection.execute(query)
     rows = result.fetchall()
-    
+
+# Convertir los resultados a un DataFrame de pandas
 df = pd.DataFrame(rows, columns=result.keys())
 
-with destino_engine.connect() as destino_connection:
-    df.to_sql('calls_filtered', destino_connection, if_exists='replace', index=False)
-    
-sourse_engine.dispose()
-destino_engine.dispose()
+# Almacenar los resultados en la nueva base de datos
+with destination_engine.connect() as destination_connection:
+    df.to_sql('calls_filtered', destination_connection, if_exists='replace', index=False)
+
+# Cierra las conexiones de los motores de SQLAlchemy
+source_engine.dispose()
+destination_engine.dispose()

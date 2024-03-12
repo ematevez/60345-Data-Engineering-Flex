@@ -1,18 +1,17 @@
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 
-#CONEXION CON LA BASE DE DATOS
-engine = create_engine("postgresql://postgres:12345@localhost/basedatos")
+# Conexión a la base de datos PostgreSQL
+engine = create_engine("postgresql://postgres:12345@localhost/postgres")
 
-
-#CONSULTA SQL
-query = """ 
+# Consulta SQL para obtener la duración de la venta más rápida para cada agente
+sql_query = """
     SELECT
         a.name AS agent_name,
-        cu.name AS customet_name,
+        cu.name AS customer_name,
         c.duration AS fastest_sale_duration
     FROM (
-        SELECT 
+        SELECT
             agentid,
             MIN(duration) AS fastest_duration
         FROM calls
@@ -25,13 +24,12 @@ query = """
     WHERE c.productsold = 1;
 """
 
-df = pd.read_sql_query(query, engine)
+# Utilizando pandas para ejecutar la consulta y obtener un DataFrame
+df = pd.read_sql_query(sql_query, engine)
 
-print("Resultados Consulta")
+# Muestra los resultados en la consola
+print("Resultados de la consulta OLAP:")
 print(df)
 
+# Cierra la conexión del motor de SQLAlchemy
 engine.dispose()
-
-"""
-Momento 3 OLAP: extraer información para cada agente de: duración de venta más rápida, a qué cliente fue y el nombre del agente. Todo esto para poder otorgar bonos a los agentes.  
-"""
